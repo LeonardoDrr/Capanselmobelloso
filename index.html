@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Página Web</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="style1.css">
+  <style>
+    /* Estilos CSS aquí */
+    /* Añade aquí los estilos adicionales si es necesario */
+
+    /* Hacer que la tabla sea responsive */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow-x: auto;
+    }
+
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-background"></div>
+  <div class="header-content">
+    <h1>Capitan Anselmo Bellozo "Tecnica"</h1>
+    <div class="dropdown">
+      <button class="dropbtn">Redes Sociales</button>
+      <div class="dropdown-content">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="C:\Users\hp\Desktop\prototipo 3\seccion1\index.html"><h3>Secciones 1 año</h3></a></li>
+    <!-- Otras secciones del menú -->
+  </ul>
+</nav>
+
+<main>
+  <h2>Notas de los Estudiantes</h2>
+  <br>
+  <table id="excel-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Nota</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Filas de la tabla serán agregadas por JavaScript -->
+    </tbody>
+  </table>
+</main>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    handleFile('Notas.xlsx'); // Carga el archivo Notas.xlsx al cargar la página
+  });
+
+  function handleFile(fileName) {
+    const reader = new FileReader();
+    const file = 'notas.xlsx'; // Nombre del archivo Excel en la misma carpeta que este HTML
+
+    reader.onload = function(e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const range = XLSX.utils.decode_range(sheet['!ref']); // Obtener el rango de celdas
+
+      const tableBody = document.getElementById('excel-table').getElementsByTagName('tbody')[0];
+
+      // Limpiar la tabla antes de agregar nuevas filas
+      tableBody.innerHTML = '';
+
+      // Iterar sobre el rango de celdas y agregar solo hasta B30
+      for (let R = range.s.r; R <= 30; ++R) {
+        const newRow = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        const scoreCell = document.createElement('td');
+
+        const name = sheet[XLSX.utils.encode_cell({r: R, c: 0})]; // Obtener el contenido de la celda A[R]
+        const score = sheet[XLSX.utils.encode_cell({r: R, c: 1})]; // Obtener el contenido de la celda B[R]
+
+        nameCell.textContent = name ? name.v : ''; // Si la celda está definida, obtener su valor, de lo contrario, dejarla vacía
+        scoreCell.textContent = score ? score.v : ''; // Si la celda está definida, obtener su valor, de lo contrario, dejarla vacía
+
+        newRow.appendChild(nameCell);
+        newRow.appendChild(scoreCell);
+        tableBody.appendChild(newRow);
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+</script>
+
+</body>
+</html>
